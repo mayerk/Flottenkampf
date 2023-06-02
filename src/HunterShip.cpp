@@ -7,11 +7,21 @@ HunterShip::HunterShip(): Ship( 75, 4, 30) {
 HunterShip::~HunterShip() {}
 
 bool HunterShip::attack(Ship *other) {
+    std::cout << *this << ((this->getFleetType() == Utility::HOME) ? "(Home)" : "(Opponent)") << " attacks " << *other << ((other->getFleetType() == Utility::HOME) ? "(Home)" : "(Opponent)");
+    float damageMultiplier = 1;
+    // Damage reduction depending on range
+    if(other->getCoordinates().getY() - this->getCoordinates().getY() > 10) {
+        damageMultiplier = 0.6;
+    } else if(other->getCoordinates().getY() - this->getCoordinates().getY() > 6) {
+        damageMultiplier = 0.8;
+    }
     int r = Utility::getRandBetween(1, 10);
     if(r < other->getSize()) {
+        std::cout << " - Attack missed it's target" << std::endl;
         return false;
     }
-    ((r >= 9) ? other->takeDamage(this->damage*2) : other->takeDamage(this->damage));
+    std::cout << " - The attack was successful" << std::endl;
+    ((r >= 9) ? other->takeDamage(roundf(this->damage*2*damageMultiplier)) : other->takeDamage(roundf(this->damage*damageMultiplier)));
     return true;
 }
 

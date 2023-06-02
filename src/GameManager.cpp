@@ -6,19 +6,30 @@ GameManager::GameManager() {
 
 void GameManager::start() {
     while (manager());
-    int x;
-    std::cin >> x;
 }
 
 bool GameManager::manager() {
-    // TODO: Play again?
     insertFleet();
     std::cout << *this->battlefield << std::endl;
     printFleets();
     startBattle();
     std::cout << *this->battlefield << std::endl;
     printResult();
-    return true;
+
+    bool err = false;
+    char input;
+    do {
+        std::cout << "Do you want to play again? (y/n)";
+        std::cin >> input;
+        if(input != 'y' && input != 'n') {
+            err = true;
+            std::cout << "Incorrect input!" << std::endl;
+        } else {
+            err = false;
+        }
+    } while (err);
+
+    return (input == 'y');
 }
 
 void GameManager::insertFleet() {
@@ -103,28 +114,20 @@ void GameManager::processAttack(bool home) {
         attackerIndex = Utility::getRandBetween(0, (int)this->homeFleet.size()-1);
         defenderIndex = Utility::getRandBetween(0, (int)this->opponentFleet.size()-1);
         if(this->homeFleet.at(attackerIndex)->getShipType() != Utility::CRUISER) {
-            std::cout << *this->homeFleet.at(attackerIndex) << "(Home) attacks " << *this->opponentFleet.at(defenderIndex) << "(Opponent)";
             if(this->homeFleet.at(attackerIndex)->attack(this->opponentFleet.at(defenderIndex))) {
-                std::cout << " - The attack was successful" << std::endl;
                 if(this->opponentFleet.at(defenderIndex)->getShield() < 1) {
                     removeShip(this->opponentFleet.at(defenderIndex), defenderIndex);
                 }
-            } else {
-                std::cout << " - " << *this->homeFleet.at(attackerIndex) << " missed it's target" << std::endl;
             }
         } else {
             bool success;
             do {
                 defenderIndex = Utility::getRandBetween(0, (int)this->opponentFleet.size()-1);
-                std::cout << *this->homeFleet.at(attackerIndex) << "(Home) attacks " << *this->opponentFleet.at(defenderIndex) << "(Opponent)";
                 success = this->homeFleet.at(attackerIndex)->attack(this->opponentFleet.at(defenderIndex));
                 if(success) {
-                    std::cout << " - The attack was successful" << std::endl;
                     if(this->opponentFleet.at(defenderIndex)->getShield() < 1) {
                         removeShip(this->opponentFleet.at(defenderIndex), defenderIndex);
                     }
-                } else {
-                    std::cout << " - " << *this->homeFleet.at(attackerIndex) << " missed it's target" << std::endl;
                 }
             } while(success && isActive());
         }
@@ -132,28 +135,20 @@ void GameManager::processAttack(bool home) {
         attackerIndex = Utility::getRandBetween(0, (int)this->opponentFleet.size()-1);
         defenderIndex = Utility::getRandBetween(0, (int)this->homeFleet.size()-1);
         if(this->opponentFleet.at(attackerIndex)->getShipType() != Utility::CRUISER) {
-            std::cout << *this->opponentFleet.at(attackerIndex) << "(Opponent) attacks " << *this->homeFleet.at(defenderIndex) << "(Home)";
             if(this->opponentFleet.at(attackerIndex)->attack(this->homeFleet.at(defenderIndex))) {
-                std::cout << " - The attack was successful" << std::endl;
                 if(this->homeFleet.at(defenderIndex)->getShield() < 1) {
                     removeShip(this->homeFleet.at(defenderIndex), defenderIndex);
                 }
-            } else {
-                std::cout << " - " << *this->opponentFleet.at(attackerIndex) << " missed it's target" << std::endl;
             }
         } else {
             bool success;
             do {
                 defenderIndex = Utility::getRandBetween(0, (int)this->homeFleet.size()-1);
-                std::cout << *this->opponentFleet.at(attackerIndex) << "(Opponent) attacks " << *this->homeFleet.at(defenderIndex) << "(Home)";
                 success = this->opponentFleet.at(attackerIndex)->attack(this->homeFleet.at(defenderIndex));
                 if(success) {
-                    std::cout << " - The attack was successful" << std::endl;
                     if(this->homeFleet.at(defenderIndex)->getShield() < 1) {
                         removeShip(this->homeFleet.at(defenderIndex), defenderIndex);
                     }
-                } else {
-                    std::cout << " - " << *this->opponentFleet.at(attackerIndex) << " missed it's target" << std::endl;
                 }
             } while(success && isActive());
         }

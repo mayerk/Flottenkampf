@@ -4,6 +4,7 @@
 #include <string>
 #include "Utility.h"
 #include "Coordinates.h"
+#include <cmath>
 
 class Ship {
 public:
