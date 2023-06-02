@@ -1,5 +1,9 @@
 #include "../include/GameManager.h"
 
+GameManager::GameManager() {
+    this->battlefield = new Battlefield();
+}
+
 void GameManager::start() {
     while (manager());
     int x;
@@ -9,20 +13,12 @@ void GameManager::start() {
 bool GameManager::manager() {
     // TODO: Play again?
     insertFleet();
-    initializeMap();
+    std::cout << *this->battlefield << std::endl;
     printFleets();
-    //startBattle();
-    //printFleets();
-    //printResult();
+    startBattle();
+    std::cout << *this->battlefield << std::endl;
+    printResult();
     return true;
-}
-
-void GameManager::initializeMap() {
-    for(auto& x: this->map) {
-        for(auto &y: x) {
-            y = nullptr;
-        }
-    }
 }
 
 void GameManager::insertFleet() {
@@ -38,8 +34,10 @@ void GameManager::insertFleet() {
         for(int j=0; j < size; ++j) {
             if(i == 0) {
                 this->homeFleet.emplace_back(chooseShip());
+                this->homeFleet.back()->setFleetType(Utility::HOME);
             } else {
                 this->opponentFleet.emplace_back(chooseShip());
+                this->opponentFleet.back()->setFleetType(Utility::OPPONENT);
             }
         }
     }
@@ -64,7 +62,7 @@ void GameManager::generateShipCoordinates() {
             tmp.generate(true);
         } while(isShipAtCoordinates(tmp, true));
         ship->setCoordinates(tmp);
-        this->map[ship->getCoordinates().getY()][ship->getCoordinates().getX()] = ship;
+        this->battlefield->placeShip(ship);
     }
     for(Ship* ship: this->opponentFleet) {
         Coordinates tmp = Coordinates();
@@ -72,21 +70,21 @@ void GameManager::generateShipCoordinates() {
             tmp.generate(false);
         } while(isShipAtCoordinates(tmp, false));
         ship->setCoordinates(tmp);
-        this->map[ship->getCoordinates().getY()][ship->getCoordinates().getX()] = ship;
+        this->battlefield->placeShip(ship);
     }
 }
 
 void GameManager::printFleets() {
-    std::cout << std::endl << "--- Home fleet ---" << std::endl;
+    std::cout << "--- Home fleet ---" << std::endl;
     int i=1;
     for(Ship* ship: this->homeFleet) {
-        std::cout << "(" << i << ") " << *ship << " - " << ship->getCoordinates().getX() << " | " << ship->getCoordinates().getY() << std::endl;
+        std::cout << "(" << i << ") " << *ship << std::endl;
         ++i;
     }
     i = 1;
     std::cout << "--- Opposition fleet ---" << std::endl;
     for(Ship* ship: this->opponentFleet) {
-        std::cout << "(" << i << ") " << *ship << " - " << ship->getCoordinates().getX() << " | " << ship->getCoordinates().getY() << std::endl;
+        std::cout << "(" << i << ") " << *ship << std::endl;
         ++i;
     }
 }
@@ -104,13 +102,12 @@ void GameManager::processAttack(bool home) {
     if(home) {
         attackerIndex = Utility::getRandBetween(0, (int)this->homeFleet.size()-1);
         defenderIndex = Utility::getRandBetween(0, (int)this->opponentFleet.size()-1);
-        if(this->homeFleet.at(attackerIndex)->getType() != Utility::CRUISER) {
+        if(this->homeFleet.at(attackerIndex)->getShipType() != Utility::CRUISER) {
             std::cout << *this->homeFleet.at(attackerIndex) << "(Home) attacks " << *this->opponentFleet.at(defenderIndex) << "(Opponent)";
             if(this->homeFleet.at(attackerIndex)->attack(this->opponentFleet.at(defenderIndex))) {
                 std::cout << " - The attack was successful" << std::endl;
                 if(this->opponentFleet.at(defenderIndex)->getShield() < 1) {
-                    this->opponentFleet.erase(this->opponentFleet.begin() + defenderIndex);
-                    std::cout << "Ship was destroyed" << std::endl;
+                    removeShip(this->opponentFleet.at(defenderIndex), defenderIndex);
                 }
             } else {
                 std::cout << " - " << *this->homeFleet.at(attackerIndex) << " missed it's target" << std::endl;
@@ -124,8 +121,7 @@ void GameManager::processAttack(bool home) {
                 if(success) {
                     std::cout << " - The attack was successful" << std::endl;
                     if(this->opponentFleet.at(defenderIndex)->getShield() < 1) {
-                        this->opponentFleet.erase(this->opponentFleet.begin() + defenderIndex);
-                        std::cout << "Ship was destroyed" << std::endl;
+                        removeShip(this->opponentFleet.at(defenderIndex), defenderIndex);
                     }
                 } else {
                     std::cout << " - " << *this->homeFleet.at(attackerIndex) << " missed it's target" << std::endl;
@@ -135,13 +131,12 @@ void GameManager::processAttack(bool home) {
     } else {
         attackerIndex = Utility::getRandBetween(0, (int)this->opponentFleet.size()-1);
         defenderIndex = Utility::getRandBetween(0, (int)this->homeFleet.size()-1);
-        if(this->opponentFleet.at(attackerIndex)->getType() != Utility::CRUISER) {
+        if(this->opponentFleet.at(attackerIndex)->getShipType() != Utility::CRUISER) {
             std::cout << *this->opponentFleet.at(attackerIndex) << "(Opponent) attacks " << *this->homeFleet.at(defenderIndex) << "(Home)";
             if(this->opponentFleet.at(attackerIndex)->attack(this->homeFleet.at(defenderIndex))) {
                 std::cout << " - The attack was successful" << std::endl;
                 if(this->homeFleet.at(defenderIndex)->getShield() < 1) {
-                    this->homeFleet.erase(this->homeFleet.begin() + defenderIndex);
-                    std::cout << "Ship was destroyed" << std::endl;
+                    removeShip(this->homeFleet.at(defenderIndex), defenderIndex);
                 }
             } else {
                 std::cout << " - " << *this->opponentFleet.at(attackerIndex) << " missed it's target" << std::endl;
@@ -155,8 +150,7 @@ void GameManager::processAttack(bool home) {
                 if(success) {
                     std::cout << " - The attack was successful" << std::endl;
                     if(this->homeFleet.at(defenderIndex)->getShield() < 1) {
-                        this->homeFleet.erase(this->homeFleet.begin() + defenderIndex);
-                        std::cout << "Ship was destroyed" << std::endl;
+                        removeShip(this->homeFleet.at(defenderIndex), defenderIndex);
                     }
                 } else {
                     std::cout << " - " << *this->opponentFleet.at(attackerIndex) << " missed it's target" << std::endl;
@@ -175,6 +169,16 @@ bool GameManager::isActive() {
         shield2 += ship->getShield();
     }
     return (shield1 > 0 && shield2 > 0);
+}
+
+void GameManager::removeShip(Ship *ship, int index) {
+    if(ship->getFleetType() == Utility::HOME) {
+        this->homeFleet.erase(this->homeFleet.begin() + index);
+    } else {
+        this->opponentFleet.erase(this->opponentFleet.begin() + index);
+    }
+    this->battlefield->removeShip(ship);
+    std::cout << "Ship was destroyed" << std::endl;
 }
 
 bool GameManager::isShipAtCoordinates(Coordinates coordinates, bool isHome) {

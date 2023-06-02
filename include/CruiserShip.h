@@ -6,8 +6,10 @@
 class CruiserShip: public Ship{
 public:
     CruiserShip();
+    virtual ~CruiserShip();
 
     bool attack(Ship* other) override;
+    char getFirstLetter() override;
 };
 
 

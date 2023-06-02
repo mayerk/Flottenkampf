@@ -6,8 +6,14 @@ Ship::Ship(int shield, int size, int damage) {
     this->damage = damage;
 }
 
-Utility::SHIP_TYPE Ship::getType() const {
-    return type;
+Ship::~Ship() {}
+
+Utility::SHIP_TYPE Ship::getShipType() const {
+    return shipType;
+}
+
+Utility::FLEET_TYPE Ship::getFleetType() const {
+    return fleetType;
 }
 
 int Ship::getShield() const {
@@ -20,6 +26,10 @@ int Ship::getSize() const {
 
 const Coordinates &Ship::getCoordinates() const {
     return coordinates;
+}
+
+void Ship::setFleetType(Utility::FLEET_TYPE fleetType) {
+    this->fleetType = fleetType;
 }
 
 void Ship::setShield(int shield) {
@@ -35,7 +45,7 @@ void Ship::takeDamage(int dmg) {
 }
 
 std::ostream &operator<<(std::ostream &os, const Ship &ship) {
-    switch (ship.getType()) {
+    switch (ship.getShipType()) {
         case Utility::HUNTER: {
             os << "Hunter";
             break;

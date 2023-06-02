@@ -1,8 +1,10 @@
 #include "../include/CruiserShip.h"
 
 CruiserShip::CruiserShip(): Ship( 250, 8, 50) {
-    this->type = Utility::CRUISER;
+    this->shipType = Utility::CRUISER;
 }
+
+CruiserShip::~CruiserShip() {}
 
 bool CruiserShip::attack(Ship *other) {
     int r = Utility::getRandBetween(1, 10);
@@ -11,4 +13,8 @@ bool CruiserShip::attack(Ship *other) {
     }
     other->takeDamage(this->damage);
     return true;
+}
+
+char CruiserShip::getFirstLetter() {
+    return 'C';
 }

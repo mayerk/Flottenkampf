@@ -8,15 +8,15 @@
 #include "DestroyerShip.h"
 #include "CruiserShip.h"
 #include "Utility.h"
+#include "Battlefield.h"
 
 class GameManager {
 public:
-    GameManager() = default;
+    GameManager();
 
     void start();
 
 private:
-    void initializeMap();
     bool manager();
     void insertFleet();
     Ship* chooseShip();
@@ -25,10 +25,11 @@ private:
     void startBattle();
     bool isActive();
     void processAttack(bool home);
+    void removeShip(Ship* ship, int index);
     bool isShipAtCoordinates(Coordinates coordinates, bool isHome);
     void printResult();
 
-    std::array<std::array<Ship*, Utility::Data::HEIGHT>, Utility::Data::WIDTH> map;
+    Battlefield* battlefield;
     std::vector<Ship*> homeFleet;
     std::vector<Ship*> opponentFleet;
 };

@@ -1,8 +1,10 @@
 #include "../include/DestroyerShip.h"
 
 DestroyerShip::DestroyerShip(): Ship(150, 6, 60) {
-    this->type = Utility::DESTROYER;
+    this->shipType = Utility::DESTROYER;
 }
+
+DestroyerShip::~DestroyerShip() {}
 
 bool DestroyerShip::attack(Ship *other) {
     int r = Utility::getRandBetween(1, 10);
@@ -12,4 +14,8 @@ bool DestroyerShip::attack(Ship *other) {
     }
     other->takeDamage(this->damage);
     return true;
+}
+
+char DestroyerShip::getFirstLetter() {
+    return 'D';
 }

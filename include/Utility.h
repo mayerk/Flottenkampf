@@ -12,6 +12,7 @@ namespace Utility {
     }
 
     enum SHIP_TYPE {HUNTER, DESTROYER, CRUISER};
+    enum FLEET_TYPE {HOME, OPPONENT};
 
     int getInput(std::string message, int range);
     int getRandBetween(int min, int max);

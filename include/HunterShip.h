@@ -6,8 +6,10 @@
 class HunterShip: public Ship{
 public:
     HunterShip();
+    virtual ~HunterShip();
 
     bool attack(Ship* other) override;
+    char getFirstLetter() override;
 };
 
 
