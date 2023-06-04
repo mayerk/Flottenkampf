@@ -21,22 +21,22 @@ public:
 
     void setShield(int shield);
     void setCoordinates(const Coordinates &coordinates);
+    void setFleetType(Utility::FLEET_TYPE fleetType);
 
     virtual bool attack(Ship* other) = 0;
-    // TODO: evtl -= operator overloading
     void takeDamage(int dmg);
+    void gainExperience();
 
     friend std::ostream& operator<<(std::ostream& os, const Ship& ship);
-
-    void setFleetType(Utility::FLEET_TYPE fleetType);
 
 protected:
     Utility::SHIP_TYPE shipType;
     Utility::FLEET_TYPE fleetType;
+    Coordinates coordinates;
     int shield;
     int size;
     int damage;
-    Coordinates coordinates;
+    int experience;
 };
 
 

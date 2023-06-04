@@ -6,8 +6,14 @@ Coordinates::Coordinates() {
 }
 
 Coordinates::Coordinates(int x, int y) {
-    this->x = (x < 0) ? 0 : (x >= Utility::Data::WIDTH) ? Utility::Data::WIDTH-1 : x;
-    this->y = (y < 0) ? 0 : (y >= Utility::Data::HEIGHT) ? Utility::Data::HEIGHT-1 : y;
+    if(x < 0 || x >= Utility::Data::WIDTH) {
+        throw std::out_of_range("Parameter is out of field range");
+    }
+    if(y < 0 || y >= Utility::Data::HEIGHT) {
+        throw std::out_of_range("Parameter is out of field range");
+    }
+    this->x = x;
+    this->y = y;
 }
 
 int Coordinates::getX() const {
@@ -16,11 +22,6 @@ int Coordinates::getX() const {
 
 int Coordinates::getY() const {
     return y;
-}
-
-void Coordinates::update(const int newX, const int newY) {
-    this->x = (newX < 0) ? 0 : (newX >= Utility::Data::WIDTH) ? Utility::Data::WIDTH-1 : newX;
-    this->y = (newY < 0) ? 0 : (newY >= Utility::Data::HEIGHT) ? Utility::Data::HEIGHT-1 : newY;
 }
 
 void Coordinates::generate(bool isHome) {

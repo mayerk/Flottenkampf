@@ -11,8 +11,6 @@ public:
     int getX() const;
     int getY() const;
 
-    void update(int newX, int newY);
-
     void generate(bool isHome);
 
 private:

@@ -21,7 +21,23 @@ bool CruiserShip::attack(Ship *other) {
         return false;
     }
     std::cout << " - The attack was successful" << std::endl;
-    other->takeDamage(roundf(this->damage*damageMultiplier));
+    this->gainExperience();
+    if(this->experience > 3) {
+        int rand = Utility::getRandBetween(1, 2);
+        // Special ability - heal
+        try {
+            other->takeDamage(roundf(this->damage*damageMultiplier));
+        } catch (const std::out_of_range& e) {
+            std::cout << e.what();
+        }
+        if(rand == 1) {
+            try {
+                this->setShield(this->shield + 20);
+            } catch (const std::out_of_range& e) {
+                std::cout << e.what();
+            }
+        }
+    }
     return true;
 }
 
